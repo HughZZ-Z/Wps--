@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交互设计图 - 代码实现</title>
+
+<style>
+    /* 基础字体与背景 */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f4f5f7;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* 主容器 */
+    .main-container {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        width: 100%;
+        max-width: 800px;
+        background-color: #fff;
+    }
+
+    /* Tab 导航栏 */
+    .tab-nav {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        background-color: #f5f5f5;
+    }
+
+    /* Tab 按钮通用样式 */
+    .tab-button {
+        padding: 12px 18px;
+        border: none;
+        background-color: inherit;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: normal;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .tab-button:hover {
+        background-color: #e0e0e0;
+    }
+
+    /* 激活状态的 Tab 按钮 */
+    .tab-button.active {
+        background-color: #fff;
+        font-weight: bold;
+        border-top: 3px solid #007bff;
+        color: #007bff;
+    }
+
+    /* Tab 内容面板 */
+    .tab-content {
+        padding: 20px;
+        background-color: #e9e9e9;
+        display: none; /* 默认隐藏 */
+    }
+
+    .tab-content.active {
+        display: block; /* 激活时显示 */
+    }
+    
+    .mockup-card {
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        text-align: center;
+    }
+    
+    .mockup-title {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .image-container img {
+        max-width: 100%;
+        border: 1px solid #ddd;
+    }
+    
+    /* 核心交互元素：Tooltip */
+    .interactive-tooltip-wrapper {
+        position: absolute;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .interactive-tooltip {
+        position: relative;
+        background-color: #2c2c2c;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        width: 260px;
+        text-align: left;
+    }
+    
+    .tooltip-title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: bold;
+    }
+    
+    .tooltip-text {
+        margin: 4px 0 12px 0;
+        font-size: 13px;
+        color: #ccc;
+        line-height: 1.5;
+    }
+    
+    .tooltip-cta-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        width: 100%;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .tooltip-cta-button:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Tooltip 的小箭头 */
+    .tooltip-arrow {
+        width: 0;
+        height: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .tooltip-arrow.down {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid #2c2c2c;
+        bottom: -8px;
+    }
+
+    .tooltip-arrow.up {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 8px solid #2c2c2c;
+        top: -8px;
+    }
+    
+    /* 步骤说明箭头 */
+    .step-indicator {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #333;
+        background-color: rgba(255,255,255,0.85);
+        padding: 4px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+    }
+    
+    /* 描述列表 */
+    .description-list {
+        margin-top: 20px;
+        text-align: left;
+        padding-left: 20px;
+    }
+    .description-list h4 {
+        margin-bottom: 8px;
+    }
+    .description-list ol {
+        padding-left: 20px;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    /* 动画 */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+<body>
+
+<div class="main-container">
+    <nav class="tab-nav">
+        <button class="tab-button active" onclick="showTab(1)">DOC预览交互</button>
+        <button class="tab-button" onclick="showTab(2)">PPT预览交互</button>
+    </nav>
+    
+    <div id="content1" class="tab-content active">
+        <div class="mockup-card">
+            <h3 class="mockup-title">DOC预览引导交互</h3>
+            <div class="image-container">
+                <img src="https://placehold.co/400x250/f0f0f0/666?text=DOC+Preview+UI" alt="DOC预览界面占位图">
+                
+                <div class="step-indicator" style="top: 120px; left: -140px;">
+                   <span>1. 用户点击，试图输入</span>
+                </div>
+
+                <div class="interactive-tooltip-wrapper" style="top: 125px; left: 100px; transform: translateX(-50%);">
+                    <div class="interactive-tooltip">
+                        <p class="tooltip-title">想开始编辑吗？</p>
+                        <p class="tooltip-text">预览模式下无法输入，请在WPS中打开以使用全部功能。</p>
+                        <button class="tooltip-cta-button">🚀 在WPS中编辑</button>
+                    </div>
+                    <div class="tooltip-arrow down"></div>
+                </div>
+            </div>
+
+            <div class="description-list">
+                <h4>交互流程说明：</h4>
+                <ol>
+                    <li><b>触发条件：</b>用户在DOC预览区域内，<b>首次点击鼠标左键</b>或<b>首次按下任意可输入按键</b>。</li>
+                    <li><b>响应动作：</b>在光标的上方或附近，平滑地弹出一个非模态的工具提示（Tooltip）。</li>
+                    <li><b>工具提示设计：</b>
+                        <ul>
+                            <li><b>指向性：</b>带有一个小箭头，明确指向用户的操作焦点（光标处）。</li>
+                            <li><b>内容：</b>包含三部分：① 标题（引导性问题）；② 解释（说明当前状态）；③ 明确的CTA按钮。</li>
+                            <li><b>交互：</b>点击CTA按钮【🚀 在WPS中编辑】。</li>
+                        </ul>
+                    </li>
+                     <li><b>后续行为：</b>
+                        <ul>
+                            <li><b>点击CTA后：</b>立即拉起WPS客户端，打开当前文档，并且光标自动定位到用户刚才在预览区点击的位置。</li>
+                            <li><b>不点击/忽略：</b>如果用户将鼠标移出预览区域，或点击预览区以外的地方，该提示自动、平滑地消失。</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <div id="content2" class="tab-content">
+        <div class="mockup-card">
+            <h3 class="mockup-title">PPT预览引导交互</h3>
+            <div class="image-container">
+                <img src="https://placehold.co/500x300/f0f0f0/666?text=PPT+Preview+UI" alt="PPT预览界面占位图">
+
+                <div class="step-indicator" style="top: 150px; left: -100px;">
+                    <span>1. 用户点击文本框</span>
+                </div>
+                
+                <div class="interactive-tooltip-wrapper" style="top: 180px; left: 250px; transform: translateX(-50%);">
+                    <div class="interactive-tooltip">
+                        <p class="tooltip-title">要修改这个标题吗？</p>
+                        <p class="tooltip-text">在预览模式下无法编辑哦，在WPS中打开即可挥洒创意。</p>
+                        <button class="tooltip-cta-button">🎨 在WPS中编辑</button>
+                    </div>
+                    <div class="tooltip-arrow up"></div>
+                </div>
+            </div>
+
+            <div class="description-list">
+                <h4>交互流程说明：</h4>
+                <ol>
+                    <li><b>触发条件：</b>用户在PPT预览区域内，<b>首次点击可选中的文本框、图片等元素</b>。</li>
+                    <li><b>响应动作：</b>在被点击元素的下方或附近，平滑地弹出一个工具提示。</li>
+                    <li><b>工具提示设计：</b>
+                        <ul>
+                             <li><b>指向性：</b>箭头指向上方被点击的元素。</li>
+                            <li><b>内容：</b>根据元素类型，文案可以更具场景化。例如点击文本框时，标题为“要修改这个标题吗？”。</li>
+                            <li><b>交互：</b>点击CTA按钮【🎨 在WPS中编辑】。</li>
+                        </ul>
+                    </li>
+                     <li><b>后续行为：</b>
+                        <ul>
+                            <li><b>点击CTA后：</b>立即拉起WPS客户端，打开当前PPT文档，并自动定位到对应的页面，并选中刚刚用户点击的那个文本框/元素。</li>
+                            <li><b>不点击/忽略：</b>逻辑同DOC，提示自动消失，不打扰用户。</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    function showTab(tabIndex) {
+        // 步骤1: 隐藏所有内容, 移除所有按钮的激活状态
+        tabContents.forEach(content => {
+            content.classList.remove('active');
+        });
+        tabButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+
+        // 步骤2: 显示点击的Tab对应的内容, 并激活对应的按钮
+        document.getElementById('content' + tabIndex).classList.add('active');
+        // event.currentTarget 在这个简单场景下可能更直接, 但为了通用性, 我们还是用选择器
+        tabButtons[tabIndex - 1].classList.add('active');
+    }
+</script>
+
+</body>
+</html>
